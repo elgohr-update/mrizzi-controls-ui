@@ -1,0 +1,13 @@
+version: '3'
+
+services:
+  keycloak:
+    image: quay.io/keycloak/keycloak:latest
+    ports:
+      - 8180:8080
+    environment:
+      KEYCLOAK_USER: admin
+      KEYCLOAK_PASSWORD: admin
+      KEYCLOAK_IMPORT: /tmp/konveyor-realm.json
+    volumes:
+      - ./konveyor-realm.json:/tmp/konveyor-realm.json:ro
