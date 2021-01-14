@@ -45,7 +45,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
       - name: Keycloak Admin CLI
-        uses: carlosthe19916/keycloak-action@master
+        uses: carlosthe19916/keycloak-action@0.3
         with:
           server: http://keycloak:8080/auth
           username: admin
