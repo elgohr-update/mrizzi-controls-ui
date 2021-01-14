@@ -1,46 +1,46 @@
-# Getting Started with Create React App
+# Controls UI
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## Development
 
-## Available Scripts
+Follow the set of instructions below to start the UI in development mode.
 
-In the project directory, you can run:
+## Clone this repository
 
-### `yarn start`
+```shell
+git clone https://github.com/carlosthe19916/controls-ui
+```
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+## Start dependencies
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+This project depends on other resources:
 
-### `yarn test`
+- Keycloak (the authentication and authorization system)
+- Controls (the backend API)
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+### Start keycloak
 
-### `yarn build`
+Use docker for starting keycloak:
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+```shell
+docker run -p 8180:8080 -e KEYCLOAK_USER=admin -e KEYCLOAK_PASSWORD=admin quay.io/keycloak/keycloak
+```
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+- Open http://localhost:8180/auth
+- Login using username=admin and password=admin
+- Create a new realm importing the file `konveyor-realm.json` located in the root folder
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+## Start the UI
 
-### `yarn eject`
+Install the npm dependencies:
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+```shell
+yarn install
+```
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+Start the UI:
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+```shell
+yarn start
+```
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
+You should be able to open http://localhost:3000 and start working on the UI.
