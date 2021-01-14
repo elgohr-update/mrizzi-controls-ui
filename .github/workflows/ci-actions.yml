@@ -50,7 +50,7 @@ jobs:
           server: http://keycloak:8080/auth
           username: admin
           password: admin
-          cmd: create realms -f conveyor-realm.json
+          cmd: create realms -f konveyor-realm.json
       - run: yarn install
       - run: yarn build:instrumentation
       - name: Cypress run
