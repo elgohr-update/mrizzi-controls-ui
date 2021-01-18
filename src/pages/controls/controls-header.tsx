@@ -4,10 +4,10 @@ import { useTranslation } from "react-i18next";
 import { AppPageSection, PageHeader } from "shared/components";
 import { Paths } from "Paths";
 
-import { CONTROLS_PAGE_I18n_NAMESPACE } from "./controls-utils";
+import { controlsPage } from "./controls-utils";
 
 export const EditCompanyHeader: React.FC = () => {
-  const { t } = useTranslation(CONTROLS_PAGE_I18n_NAMESPACE);
+  const { t } = useTranslation(controlsPage);
 
   return (
     <AppPageSection>

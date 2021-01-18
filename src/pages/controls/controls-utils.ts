@@ -1,1 +1,1 @@
-export const CONTROLS_PAGE_I18n_NAMESPACE = "controlsPage";
+export const controlsPage = "controlsPage";
