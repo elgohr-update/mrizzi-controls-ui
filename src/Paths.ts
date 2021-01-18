@@ -14,7 +14,12 @@ export enum Paths {
 
   applicationInventory = "/application-inventory",
   reports = "/reports",
+
   controls = "/controls",
+  controls_bussinessServices = "/controls/bussiness-services",
+  controls_stakeholders = "/controls/stakeholders",
+  controls_stakeholderGroups = "/controls/stakeholder-groups",
+  controls_tags = "/controls/tags",
 }
 
 export interface OptionalCompanyRoute {
