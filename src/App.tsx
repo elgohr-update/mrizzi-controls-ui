@@ -1,6 +1,7 @@
 import React from "react";
 import { BrowserRouter } from "react-router-dom";
 
+import { AppRoutes } from "./Routes";
 import "./App.scss";
 
 import { DefaultLayout } from "./layout";
@@ -11,7 +12,9 @@ import "@redhat-cloud-services/frontend-components-notifications/index.css";
 const App: React.FC = () => {
   return (
     <BrowserRouter>
-      <DefaultLayout>hello</DefaultLayout>
+      <DefaultLayout>
+        <AppRoutes />
+      </DefaultLayout>
       <NotificationsPortal />
     </BrowserRouter>
   );

@@ -12,11 +12,9 @@ export enum Paths {
   base = "/",
   notFound = "/not-found",
 
-  companyList = "/companies",
-  newCompany = "/companies/~new",
-
-  documentList = "/documents",
-  newDocument = "/documents/~new",
+  applicationInventory = "/application-inventory",
+  reports = "/reports",
+  controls = "/controls",
 }
 
 export interface OptionalCompanyRoute {

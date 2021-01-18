@@ -1,6 +1,6 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
-import { Nav, NavItem, PageSidebar, NavGroup } from "@patternfly/react-core";
+import { Nav, NavItem, PageSidebar, NavList } from "@patternfly/react-core";
 
 import { Paths } from "Paths";
 import { LayoutTheme } from "../LayoutUtils";
@@ -8,21 +8,27 @@ import { LayoutTheme } from "../LayoutUtils";
 export const SidebarApp: React.FC = () => {
   const renderPageNav = () => {
     return (
-      <Nav id="nav-primary-simple" aria-label="Nav" theme={LayoutTheme}>
-        <NavGroup title="Global">
+      <Nav id="nav-primary" aria-label="Nav" theme={LayoutTheme}>
+        <NavList title="Global">
           <NavItem>
-            <NavLink to={Paths.companyList} activeClassName="pf-m-current">
-              Menu1
+            <NavLink
+              to={Paths.applicationInventory}
+              activeClassName="pf-m-current"
+            >
+              Application inventory
             </NavLink>
           </NavItem>
-        </NavGroup>
-        <NavGroup title="Company">
           <NavItem>
-            <NavLink to={Paths.documentList} activeClassName="pf-m-current">
-              Menu2
+            <NavLink to={Paths.reports} activeClassName="pf-m-current">
+              Report
             </NavLink>
           </NavItem>
-        </NavGroup>
+          <NavItem>
+            <NavLink to={Paths.controls} activeClassName="pf-m-current">
+              Controls
+            </NavLink>
+          </NavItem>
+        </NavList>
       </Nav>
     );
   };

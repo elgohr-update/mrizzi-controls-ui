@@ -5,36 +5,42 @@ exports[`Test snapshot 1`] = `
   nav={
     <Nav
       aria-label="Nav"
-      id="nav-primary-simple"
+      id="nav-primary"
       onSelect={[Function]}
       onToggle={[Function]}
       ouiaSafe={true}
       theme="dark"
     >
-      <NavGroup
+      <NavList
+        ariaLeftScroll="Scroll left"
+        ariaRightScroll="Scroll right"
         title="Global"
       >
         <NavItem>
           <NavLink
             activeClassName="pf-m-current"
-            to="/companies"
+            to="/application-inventory"
           >
-            Menu1
+            Application inventory
           </NavLink>
         </NavItem>
-      </NavGroup>
-      <NavGroup
-        title="Company"
-      >
         <NavItem>
           <NavLink
             activeClassName="pf-m-current"
-            to="/documents"
+            to="/reports"
           >
-            Menu2
+            Report
           </NavLink>
         </NavItem>
-      </NavGroup>
+        <NavItem>
+          <NavLink
+            activeClassName="pf-m-current"
+            to="/controls"
+          >
+            Controls
+          </NavLink>
+        </NavItem>
+      </NavList>
     </Nav>
   }
   theme="dark"
