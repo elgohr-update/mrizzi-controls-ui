@@ -1,0 +1,9 @@
+{
+    "title": "Controls",
+    "tabs": {
+        "bussinessServices": "Bussiness services",
+        "stakeholders": "Stakeholders",
+        "stakeholderGroups": "Stakeholder groups",
+        "tags": "Tags"
+    }
+}

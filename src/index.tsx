@@ -12,7 +12,10 @@ import { initApi, initInterceptors } from "axios-config";
 import { ReactKeycloakProvider } from "@react-keycloak/web";
 import keycloak from "./keycloak";
 
+import i18n from "./i18n";
+
 initApi();
+i18n.init();
 
 ReactDOM.render(
   <React.StrictMode>
@@ -35,6 +38,11 @@ ReactDOM.render(
               }
             });
           });
+
+          const kcLocale = (keycloak.tokenParsed as any)["locale"];
+          if (kcLocale) {
+            i18n.changeLanguage((keycloak.tokenParsed as any)["locale"]);
+          }
         }
 
         return !keycloak.authenticated;
