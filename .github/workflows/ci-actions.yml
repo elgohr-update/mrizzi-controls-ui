@@ -45,12 +45,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
       - name: Keycloak Admin CLI
-        uses: carlosthe19916/keycloak-action@0.3
+        uses: carlosthe19916/keycloak-action@0.4
         with:
           server: http://keycloak:8080/auth
           username: admin
           password: admin
-          cmd: create realms -f konveyor-realm.json
+          kcadm: create realms -f konveyor-realm.json
       - run: yarn install
       - run: yarn build:instrumentation
       - name: Cypress run
