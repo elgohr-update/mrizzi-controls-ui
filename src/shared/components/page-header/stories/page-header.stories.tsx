@@ -5,7 +5,7 @@ import { action } from "@storybook/addon-actions";
 import { PageHeader, PageHeaderProps } from "../page-header";
 
 export default {
-  title: "Edit company / PageHeader",
+  title: "Components / PageHeader",
   component: PageHeader,
   argTypes: {},
 } as Meta;

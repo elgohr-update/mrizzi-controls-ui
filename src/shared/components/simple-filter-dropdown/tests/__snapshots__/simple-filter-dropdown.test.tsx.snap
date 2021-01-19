@@ -1,0 +1,43 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`SimpleFilterDropdown Renders without crashing 1`] = `
+<Dropdown
+  dropdownItems={
+    Array [
+      <DropdownItem
+        component="button"
+        onClick={[Function]}
+      >
+        option1
+      </DropdownItem>,
+      <DropdownItem
+        component="button"
+        onClick={[Function]}
+      >
+        option2
+      </DropdownItem>,
+      <DropdownItem
+        component="button"
+        onClick={[Function]}
+      >
+        option3
+      </DropdownItem>,
+    ]
+  }
+  isOpen={false}
+  onSelect={[Function]}
+  position="left"
+  toggle={
+    <DropdownToggle
+      onToggle={[Function]}
+    >
+      <FilterIcon
+        color="currentColor"
+        noVerticalAlign={false}
+        size="sm"
+      />
+      My label
+    </DropdownToggle>
+  }
+/>
+`;
