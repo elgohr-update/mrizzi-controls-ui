@@ -27,7 +27,7 @@ export interface Links {
   last: string;
 }
 
-export interface BussinessService {
+export interface BusinessService {
   name: string;
   description: string;
   owners: string[];

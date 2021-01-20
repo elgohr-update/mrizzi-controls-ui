@@ -1,25 +1,25 @@
 import axios from "axios";
 import MockAdapter from "axios-mock-adapter";
 import { renderHook, act } from "@testing-library/react-hooks";
-import { useFetchBussinessServices } from "./useFetchBussinessServices";
-import { BussinessService, PageRepresentation } from "api/models";
-import { BUSSINESS_SERVICES } from "api/rest";
+import { useFetchBusinessServices } from "./useFetchBusinessServices";
+import { BusinessService, PageRepresentation } from "api/models";
+import { BUSINESS_SERVICES } from "api/rest";
 
-describe("useFetchBussinessServices", () => {
+describe("useFetchBusinessServices", () => {
   it("Fetch error due to no REST API found", async () => {
     // Mock REST API
-    new MockAdapter(axios).onGet(BUSSINESS_SERVICES).networkError();
+    new MockAdapter(axios).onGet(BUSINESS_SERVICES).networkError();
 
     // Use hook
     const { result, waitForNextUpdate } = renderHook(() =>
-      useFetchBussinessServices()
+      useFetchBusinessServices()
     );
 
     const {
-      bussinessServices: companies,
+      businessServices: companies,
       isFetching,
       fetchError,
-      fetchBussinessServices: fetchCompanies,
+      fetchBusinessServices: fetchCompanies,
     } = result.current;
 
     expect(isFetching).toBe(false);
@@ -33,13 +33,13 @@ describe("useFetchBussinessServices", () => {
     // Fetch finished
     await waitForNextUpdate();
     expect(result.current.isFetching).toBe(false);
-    expect(result.current.bussinessServices).toBeUndefined();
+    expect(result.current.businessServices).toBeUndefined();
     expect(result.current.fetchError).not.toBeUndefined();
   });
 
   it("Fetch success", async () => {
     // Mock REST API
-    const data: PageRepresentation<BussinessService> = {
+    const data: PageRepresentation<BusinessService> = {
       meta: {
         offset: 0,
         limit: 0,
@@ -55,19 +55,19 @@ describe("useFetchBussinessServices", () => {
     };
 
     new MockAdapter(axios)
-      .onGet(`${BUSSINESS_SERVICES}?offset=0&limit=10`)
+      .onGet(`${BUSINESS_SERVICES}?offset=0&limit=10`)
       .reply(200, data);
 
     // Use hook
     const { result, waitForNextUpdate } = renderHook(() =>
-      useFetchBussinessServices()
+      useFetchBusinessServices()
     );
 
     const {
-      bussinessServices: companies,
+      businessServices: companies,
       isFetching,
       fetchError,
-      fetchBussinessServices: fetchCompanies,
+      fetchBusinessServices: fetchCompanies,
     } = result.current;
 
     expect(isFetching).toBe(false);
@@ -81,7 +81,7 @@ describe("useFetchBussinessServices", () => {
     // Fetch finished
     await waitForNextUpdate();
     expect(result.current.isFetching).toBe(false);
-    expect(result.current.bussinessServices).toMatchObject(data);
+    expect(result.current.businessServices).toMatchObject(data);
     expect(result.current.fetchError).toBeUndefined();
   });
 });

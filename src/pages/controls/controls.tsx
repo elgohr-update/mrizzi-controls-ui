@@ -7,7 +7,7 @@ import { AppPlaceholder } from "shared/components";
 
 import { EditCompanyHeader } from "./controls-header";
 
-const BussinessServices = lazy(() => import("./bussiness-services"));
+const businessServices = lazy(() => import("./business-services"));
 const Stakeholders = lazy(() => import("./stakeholders"));
 const StakeholderGroups = lazy(() => import("./stakeholder-groups"));
 const Tags = lazy(() => import("./tags"));
@@ -20,8 +20,8 @@ export const Controls: React.FC = () => {
         <Suspense fallback={<AppPlaceholder />}>
           <Switch>
             <Route
-              path={Paths.controls_bussinessServices}
-              component={BussinessServices}
+              path={Paths.controls_businessServices}
+              component={businessServices}
             />
             <Route
               path={Paths.controls_stakeholders}
@@ -34,7 +34,7 @@ export const Controls: React.FC = () => {
             <Route path={Paths.controls_tags} component={Tags} />
             <Redirect
               from={Paths.controls}
-              to={Paths.controls_bussinessServices}
+              to={Paths.controls_businessServices}
               exact
             />
           </Switch>

@@ -2,19 +2,19 @@ import { AxiosPromise } from "axios";
 import { APIClient } from "axios-config";
 
 import {
-  BussinessService,
+  BusinessService,
   PageQuery,
   PageRepresentation,
   SortByQuery,
 } from "./models";
 
-export const BUSSINESS_SERVICES = "/bussiness-services";
+export const BUSINESS_SERVICES = "/business-services";
 
-export const getBussinessServices = (
+export const getBusinessServices = (
   pagination: PageQuery,
   sortBy?: SortByQuery,
   filters?: Map<string, string | string[]>
-): AxiosPromise<PageRepresentation<BussinessService>> => {
+): AxiosPromise<PageRepresentation<BusinessService>> => {
   let sortByQuery: string | undefined = undefined;
   if (sortBy) {
     sortByQuery = `${sortBy.orderBy}:${sortBy.orderDirection}`;
@@ -45,5 +45,5 @@ export const getBussinessServices = (
     }
   });
 
-  return APIClient.get(`${BUSSINESS_SERVICES}?${query.join("&")}`);
+  return APIClient.get(`${BUSINESS_SERVICES}?${query.join("&")}`);
 };

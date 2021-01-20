@@ -17,8 +17,8 @@ export const EditCompanyHeader: React.FC = () => {
         menuActions={[]}
         navItems={[
           {
-            title: t("tabs.bussinessServices"),
-            path: Paths.controls_bussinessServices,
+            title: t("tabs.businessServices"),
+            path: Paths.controls_businessServices,
           },
           {
             title: t("tabs.stakeholders"),

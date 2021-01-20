@@ -2,10 +2,10 @@ import { useCallback, useReducer } from "react";
 import { AxiosError } from "axios";
 import { ActionType, createAsyncAction, getType } from "typesafe-actions";
 
-import { getBussinessServices } from "api/rest";
+import { getBusinessServices } from "api/rest";
 import {
   PageRepresentation,
-  BussinessService,
+  BusinessService,
   PageQuery,
   SortByQuery,
 } from "api/models";
@@ -15,21 +15,21 @@ export const {
   success: fetchSuccess,
   failure: fetchFailure,
 } = createAsyncAction(
-  "useFetchBussinessServices/fetch/request",
-  "useFetchBussinessServices/fetch/success",
-  "useFetchBussinessServices/fetch/failure"
-)<void, PageRepresentation<BussinessService>, AxiosError>();
+  "useFetchBusinessServices/fetch/request",
+  "useFetchBusinessServices/fetch/success",
+  "useFetchBusinessServices/fetch/failure"
+)<void, PageRepresentation<BusinessService>, AxiosError>();
 
 type State = Readonly<{
   isFetching: boolean;
-  bussinessServices?: PageRepresentation<BussinessService>;
+  businessServices?: PageRepresentation<BusinessService>;
   fetchError?: AxiosError;
   fetchCount: number;
 }>;
 
 const defaultState: State = {
   isFetching: false,
-  bussinessServices: undefined,
+  businessServices: undefined,
   fetchError: undefined,
   fetchCount: 0,
 };
@@ -57,7 +57,7 @@ const reducer = (state: State, action: Action): State => {
         ...state,
         isFetching: false,
         fetchError: undefined,
-        bussinessServices: action.payload,
+        businessServices: action.payload,
         fetchCount: state.fetchCount + 1,
       };
     case getType(fetchFailure):
@@ -73,23 +73,23 @@ const reducer = (state: State, action: Action): State => {
 };
 
 export interface IState {
-  bussinessServices?: PageRepresentation<BussinessService>;
+  businessServices?: PageRepresentation<BusinessService>;
   isFetching: boolean;
   fetchError?: AxiosError;
   fetchCount: number;
-  fetchBussinessServices: (
+  fetchBusinessServices: (
     page: PageQuery,
     sortBy?: SortByQuery,
     filters?: Map<string, string | string[]>
   ) => void;
 }
 
-export const useFetchBussinessServices = (
+export const useFetchBusinessServices = (
   defaultIsFetching: boolean = false
 ): IState => {
   const [state, dispatch] = useReducer(reducer, defaultIsFetching, initReducer);
 
-  const fetchBussinessServices = useCallback(
+  const fetchBusinessServices = useCallback(
     (
       page: PageQuery,
       sortBy?: SortByQuery,
@@ -97,7 +97,7 @@ export const useFetchBussinessServices = (
     ) => {
       dispatch(fetchRequest());
 
-      getBussinessServices(page, sortBy, filters)
+      getBusinessServices(page, sortBy, filters)
         .then(({ data }) => {
           dispatch(fetchSuccess(data));
         })
@@ -109,12 +109,12 @@ export const useFetchBussinessServices = (
   );
 
   return {
-    bussinessServices: state.bussinessServices,
+    businessServices: state.businessServices,
     isFetching: state.isFetching,
     fetchError: state.fetchError,
     fetchCount: state.fetchCount,
-    fetchBussinessServices,
+    fetchBusinessServices,
   };
 };
 
-export default useFetchBussinessServices;
+export default useFetchBusinessServices;

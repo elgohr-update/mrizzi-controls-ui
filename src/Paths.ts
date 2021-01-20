@@ -16,7 +16,7 @@ export enum Paths {
   reports = "/reports",
 
   controls = "/controls",
-  controls_bussinessServices = "/controls/bussiness-services",
+  controls_businessServices = "/controls/business-services",
   controls_stakeholders = "/controls/stakeholders",
   controls_stakeholderGroups = "/controls/stakeholder-groups",
   controls_tags = "/controls/tags",

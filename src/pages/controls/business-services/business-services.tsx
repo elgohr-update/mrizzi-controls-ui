@@ -18,14 +18,14 @@ import {
 } from "@patternfly/react-table";
 import { AddCircleOIcon } from "@patternfly/react-icons";
 
-import { BussinessService, PageQuery, SortByQuery } from "api/models";
+import { BusinessService, PageQuery, SortByQuery } from "api/models";
 
 import {
   AppPlaceholder,
   ConditionalRender,
   AppTableWithControls,
 } from "shared/components";
-import { useTableControls, useFetchBussinessServices } from "shared/hooks";
+import { useTableControls, useFetchBusinessServices } from "shared/hooks";
 
 const columns: ICell[] = [
   { title: "Name", transforms: [sortable] },
@@ -47,15 +47,15 @@ const columnIndexToField = (
   }
 };
 
-const BUSSINESS_SERVICE_FIELD = "bussinessService";
+const BUSINESS_SERVICE_FIELD = "businessService";
 
-const getRow = (rowData: IRowData): BussinessService => {
-  return rowData[BUSSINESS_SERVICE_FIELD];
+const getRow = (rowData: IRowData): BusinessService => {
+  return rowData[BUSINESS_SERVICE_FIELD];
 };
 
-const itemsToRow = (items: BussinessService[]) => {
+const itemsToRow = (items: BusinessService[]) => {
   return items.map((item) => ({
-    [BUSSINESS_SERVICE_FIELD]: item,
+    [BUSINESS_SERVICE_FIELD]: item,
     cells: [
       {
         title: item.name,
@@ -70,13 +70,13 @@ const itemsToRow = (items: BussinessService[]) => {
   }));
 };
 
-export const BussinessServices: React.FC = () => {
+export const BusinessServices: React.FC = () => {
   const {
-    bussinessServices,
+    businessServices,
     isFetching,
     fetchError,
-    fetchBussinessServices,
-  } = useFetchBussinessServices(true);
+    fetchBusinessServices,
+  } = useFetchBusinessServices(true);
 
   const {
     paginationQuery,
@@ -88,9 +88,9 @@ export const BussinessServices: React.FC = () => {
 
   const reloadTable = useCallback(
     (pagination: PageQuery, sortBy?: SortByQuery) => {
-      fetchBussinessServices(pagination, sortBy);
+      fetchBusinessServices(pagination, sortBy);
     },
-    [fetchBussinessServices]
+    [fetchBusinessServices]
   );
 
   useEffect(() => {
@@ -106,7 +106,7 @@ export const BussinessServices: React.FC = () => {
         rowData: IRowData,
         extraData: IExtraData
       ) => {
-        const row: BussinessService = getRow(rowData);
+        const row: BusinessService = getRow(rowData);
         console.log(row);
       },
     },
@@ -118,7 +118,7 @@ export const BussinessServices: React.FC = () => {
         rowData: IRowData,
         extraData: IExtraData
       ) => {
-        const row: BussinessService = getRow(rowData);
+        const row: BusinessService = getRow(rowData);
         console.log(row);
       },
     },
@@ -127,12 +127,12 @@ export const BussinessServices: React.FC = () => {
   return (
     <PageSection>
       <ConditionalRender
-        when={isFetching && !(bussinessServices || fetchError)}
+        when={isFetching && !(businessServices || fetchError)}
         then={<AppPlaceholder />}
       >
         <AppTableWithControls
-          count={bussinessServices ? bussinessServices.meta.count : 0}
-          items={bussinessServices ? bussinessServices.data : []}
+          count={businessServices ? businessServices.meta.count : 0}
+          items={businessServices ? businessServices.data : []}
           itemsToRow={itemsToRow}
           pagination={paginationQuery}
           sortBy={sortBy}
