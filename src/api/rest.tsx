@@ -8,7 +8,8 @@ import {
   SortByQuery,
 } from "./models";
 
-export const BUSINESS_SERVICES = "/business-services";
+export const BASE_URL = "controls";
+export const BUSINESS_SERVICES = BASE_URL + "/business-services";
 
 export const getBusinessServices = (
   pagination: PageQuery,
