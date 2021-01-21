@@ -41,7 +41,7 @@ ReactDOM.render(
 
           const kcLocale = (keycloak.tokenParsed as any)["locale"];
           if (kcLocale) {
-            i18n.changeLanguage((keycloak.tokenParsed as any)["locale"]);
+            i18n.changeLanguage(kcLocale);
           }
         }
 
