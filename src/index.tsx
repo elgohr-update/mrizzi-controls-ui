@@ -13,6 +13,7 @@ import { ReactKeycloakProvider } from "@react-keycloak/web";
 import keycloak from "./keycloak";
 
 import i18n from "./i18n";
+import { NinjaErrorBoundary } from "./ninja-error-boundary";
 
 initApi();
 i18n.init();
@@ -49,7 +50,9 @@ ReactDOM.render(
       }}
     >
       <Provider store={configureStore()}>
-        <App />
+        <NinjaErrorBoundary>
+          <App />
+        </NinjaErrorBoundary>
       </Provider>
     </ReactKeycloakProvider>
   </React.StrictMode>,
