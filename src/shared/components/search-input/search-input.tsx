@@ -4,10 +4,14 @@ import { Button, InputGroup, TextInput } from "@patternfly/react-core";
 import { SearchIcon } from "@patternfly/react-icons";
 
 export interface SearchInputProps {
+  placeholder?: string;
   onSearch: (filterText: string) => void;
 }
 
-export const SearchInput: React.FC<SearchInputProps> = ({ onSearch }) => {
+export const SearchInput: React.FC<SearchInputProps> = ({
+  placeholder,
+  onSearch,
+}) => {
   const [filterText, setFilterText] = useState("");
 
   const callSearch = () => {
@@ -30,6 +34,7 @@ export const SearchInput: React.FC<SearchInputProps> = ({ onSearch }) => {
         onChange={setFilterText}
         onKeyDown={handleOnKeyDown}
         autoComplete="off"
+        placeholder={placeholder}
       />
       <Button variant="control" aria-label="search button" onClick={callSearch}>
         <SearchIcon />

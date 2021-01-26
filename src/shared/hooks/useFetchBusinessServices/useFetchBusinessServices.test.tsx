@@ -2,7 +2,11 @@ import axios from "axios";
 import MockAdapter from "axios-mock-adapter";
 import { renderHook, act } from "@testing-library/react-hooks";
 import { useFetchBusinessServices } from "./useFetchBusinessServices";
-import { BusinessService, PageRepresentation } from "api/models";
+import {
+  BusinessService,
+  BusinessServicePage,
+  PageRepresentation,
+} from "api/models";
 import { BUSINESS_SERVICES } from "api/rest";
 
 describe("useFetchBusinessServices", () => {
@@ -16,18 +20,20 @@ describe("useFetchBusinessServices", () => {
     );
 
     const {
-      businessServices: companies,
+      businessServices,
       isFetching,
       fetchError,
-      fetchBusinessServices: fetchCompanies,
+      fetchBusinessServices,
     } = result.current;
 
     expect(isFetching).toBe(false);
-    expect(companies).toBeUndefined();
+    expect(businessServices).toBeUndefined();
     expect(fetchError).toBeUndefined();
 
     // Init fetch
-    act(() => fetchCompanies({ page: 2, perPage: 50 }));
+    act(() =>
+      fetchBusinessServices({ filterText: "" }, { page: 2, perPage: 50 })
+    );
     expect(result.current.isFetching).toBe(true);
 
     // Fetch finished
@@ -39,23 +45,15 @@ describe("useFetchBusinessServices", () => {
 
   it("Fetch success", async () => {
     // Mock REST API
-    const data: PageRepresentation<BusinessService> = {
-      meta: {
-        offset: 0,
-        limit: 0,
-        count: 0,
+    const data: BusinessServicePage = {
+      _embedded: {
+        "business-service": [],
       },
-      links: {
-        first: "",
-        previous: "",
-        last: "",
-        next: "",
-      },
-      data: [],
+      total_count: 0,
     };
 
     new MockAdapter(axios)
-      .onGet(`${BUSINESS_SERVICES}?offset=0&limit=10`)
+      .onGet(`${BUSINESS_SERVICES}?page=0&size=10&filter=something`)
       .reply(200, data);
 
     // Use hook
@@ -64,24 +62,32 @@ describe("useFetchBusinessServices", () => {
     );
 
     const {
-      businessServices: companies,
+      businessServices,
       isFetching,
       fetchError,
-      fetchBusinessServices: fetchCompanies,
+      fetchBusinessServices,
     } = result.current;
 
     expect(isFetching).toBe(false);
-    expect(companies).toBeUndefined();
+    expect(businessServices).toBeUndefined();
     expect(fetchError).toBeUndefined();
 
     // Init fetch
-    act(() => fetchCompanies({ page: 1, perPage: 10 }));
+    act(() =>
+      fetchBusinessServices(
+        { filterText: "something" },
+        { page: 1, perPage: 10 }
+      )
+    );
     expect(result.current.isFetching).toBe(true);
 
     // Fetch finished
     await waitForNextUpdate();
     expect(result.current.isFetching).toBe(false);
-    expect(result.current.businessServices).toMatchObject(data);
+    expect(result.current.businessServices).toMatchObject({
+      data: [],
+      meta: { count: 0 },
+    });
     expect(result.current.fetchError).toBeUndefined();
   });
 });

@@ -1,11 +1,15 @@
-import React, { useCallback, useEffect } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
+  Button,
+  ButtonVariant,
   EmptyState,
   EmptyStateBody,
   EmptyStateIcon,
   EmptyStateVariant,
   PageSection,
   Title,
+  ToolbarGroup,
+  ToolbarItem,
 } from "@patternfly/react-core";
 import {
   IActions,
@@ -24,13 +28,14 @@ import {
   AppPlaceholder,
   ConditionalRender,
   AppTableWithControls,
+  SearchInput,
 } from "shared/components";
 import { useTableControls, useFetchBusinessServices } from "shared/hooks";
 
 const columns: ICell[] = [
   { title: "Name", transforms: [sortable] },
   { title: "Description" },
-  { title: "Owner" },
+  { title: "Owner", transforms: [sortable] },
 ];
 
 const columnIndexToField = (
@@ -42,6 +47,8 @@ const columnIndexToField = (
   switch (index) {
     case 0:
       return "name";
+    case 2:
+      return "owner";
     default:
       throw new Error("Invalid column index=" + index);
   }
@@ -64,13 +71,15 @@ const itemsToRow = (items: BusinessService[]) => {
         title: item.description,
       },
       {
-        title: item.owners.join(", "),
+        title: item.owner ? `${item.owner.name} ${item.owner.surname}` : "",
       },
     ],
   }));
 };
 
 export const BusinessServices: React.FC = () => {
+  const [filterText, setFilterText] = useState("");
+
   const {
     businessServices,
     isFetching,
@@ -87,15 +96,15 @@ export const BusinessServices: React.FC = () => {
   } = useTableControls({ columnToField: columnIndexToField });
 
   const reloadTable = useCallback(
-    (pagination: PageQuery, sortBy?: SortByQuery) => {
-      fetchBusinessServices(pagination, sortBy);
+    (filterText: string, pagination: PageQuery, sortBy?: SortByQuery) => {
+      fetchBusinessServices({ filterText }, pagination, sortBy);
     },
     [fetchBusinessServices]
   );
 
   useEffect(() => {
-    reloadTable(paginationQuery, sortByQuery);
-  }, [paginationQuery, sortByQuery, reloadTable]);
+    reloadTable(filterText, paginationQuery, sortByQuery);
+  }, [filterText, paginationQuery, sortByQuery, reloadTable]);
 
   const actions: IActions = [
     {
@@ -124,6 +133,15 @@ export const BusinessServices: React.FC = () => {
     },
   ];
 
+  const handleOnSearch = (filterText: string) => {
+    setFilterText(filterText);
+    handlePaginationChange({ page: 1 });
+  };
+
+  const handleOnCreateNew = () => {
+    console.log("Create new");
+  };
+
   return (
     <PageSection>
       <ConditionalRender
@@ -144,6 +162,27 @@ export const BusinessServices: React.FC = () => {
           loadingVariant="skeleton"
           fetchError={fetchError}
           filtersApplied={false}
+          toolbar={
+            <>
+              <ToolbarGroup>
+                <ToolbarItem>
+                  <SearchInput onSearch={handleOnSearch} placeholder="Filter" />
+                </ToolbarItem>
+              </ToolbarGroup>
+              <ToolbarGroup variant="button-group">
+                <ToolbarItem>
+                  <Button
+                    type="button"
+                    aria-label="new-company"
+                    variant={ButtonVariant.primary}
+                    onClick={handleOnCreateNew}
+                  >
+                    Create new
+                  </Button>
+                </ToolbarItem>
+              </ToolbarGroup>
+            </>
+          }
           noDataState={
             <EmptyState variant={EmptyStateVariant.small}>
               <EmptyStateIcon icon={AddCircleOIcon} />

@@ -8,12 +8,19 @@ import {
 
 import { PageQuery, SortByQuery } from "api/models";
 
+interface PaginationAction {
+  page: number;
+  perPage?: number;
+}
+
 const setSortBy = createAction("app-table/sortBy/change")<{
   index: number;
   fieldName: string;
   direction: "asc" | "desc";
 }>();
-const setPagination = createAction("app-table/pagination/change")<PageQuery>();
+const setPagination = createAction(
+  "app-table/pagination/change"
+)<PaginationAction>();
 
 type State = Readonly<{
   changed: boolean;
@@ -42,7 +49,12 @@ const reducer = (state: State, action: Action): State => {
       return {
         ...state,
         changed: true,
-        paginationQuery: { ...action.payload },
+        paginationQuery: {
+          page: action.payload.page,
+          perPage: action.payload.perPage
+            ? action.payload.perPage
+            : state.paginationQuery.perPage,
+        },
       };
     case getType(setSortBy):
       return {
@@ -77,13 +89,7 @@ interface HookState {
   paginationQuery: PageQuery;
   sortByQuery?: SortByQuery;
   sortBy?: ISortBy;
-  handlePaginationChange: ({
-    page,
-    perPage,
-  }: {
-    page: number;
-    perPage: number;
-  }) => void;
+  handlePaginationChange: (pagination: PaginationAction) => void;
   handleSortChange: (
     event: React.MouseEvent,
     index: number,
@@ -97,12 +103,9 @@ export const useTableControls = ({
 }: HookArgs): HookState => {
   const [state, dispatch] = useReducer(reducer, defaultState);
 
-  const handlePaginationChange = useCallback(
-    ({ page, perPage }: { page: number; perPage: number }) => {
-      dispatch(setPagination({ page, perPage }));
-    },
-    []
-  );
+  const handlePaginationChange = useCallback((pagination: PaginationAction) => {
+    dispatch(setPagination(pagination));
+  }, []);
 
   const handleSortChange = useCallback(
     (

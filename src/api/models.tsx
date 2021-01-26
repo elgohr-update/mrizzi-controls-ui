@@ -10,25 +10,28 @@ export interface SortByQuery {
 
 export interface PageRepresentation<T> {
   meta: Meta;
-  links: Links;
   data: T[];
 }
 
 export interface Meta {
-  offset: number;
-  limit: number;
   count: number;
-}
-
-export interface Links {
-  first: string;
-  next: string;
-  previous: string;
-  last: string;
 }
 
 export interface BusinessService {
   name: string;
   description: string;
-  owners: string[];
+  owner: Owner;
+}
+
+export interface Owner {
+  name: string;
+  surname: string;
+  email: string;
+}
+
+export interface BusinessServicePage {
+  _embedded: {
+    "business-service": BusinessService[];
+  };
+  total_count: number;
 }

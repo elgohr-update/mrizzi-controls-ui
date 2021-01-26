@@ -78,9 +78,11 @@ export interface IState {
   fetchError?: AxiosError;
   fetchCount: number;
   fetchBusinessServices: (
+    filters: {
+      filterText?: string;
+    },
     page: PageQuery,
-    sortBy?: SortByQuery,
-    filters?: Map<string, string | string[]>
+    sortBy?: SortByQuery
   ) => void;
 }
 
@@ -91,15 +93,25 @@ export const useFetchBusinessServices = (
 
   const fetchBusinessServices = useCallback(
     (
+      filters: { filterText?: string },
       page: PageQuery,
-      sortBy?: SortByQuery,
-      filters?: Map<string, string | string[]>
+      sortBy?: SortByQuery
     ) => {
       dispatch(fetchRequest());
 
-      getBusinessServices(page, sortBy, filters)
+      getBusinessServices(filters, page, sortBy)
         .then(({ data }) => {
-          dispatch(fetchSuccess(data));
+          const list = data._embedded["business-service"];
+          const total = data.total_count;
+
+          dispatch(
+            fetchSuccess({
+              data: list,
+              meta: {
+                count: total,
+              },
+            })
+          );
         })
         .catch((error: AxiosError) => {
           dispatch(fetchFailure(error));
