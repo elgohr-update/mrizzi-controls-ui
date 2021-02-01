@@ -8,7 +8,6 @@ import {
   EmptyStateBody,
   EmptyStateIcon,
   EmptyStateVariant,
-  PageSection,
   Title,
   ToolbarGroup,
   ToolbarItem,
@@ -218,7 +217,7 @@ export const BusinessServices: React.FC = () => {
   };
 
   return (
-    <PageSection>
+    <>
       <ConditionalRender
         when={isFetching && !(businessServices || fetchError)}
         then={<AppPlaceholder />}
@@ -282,6 +281,6 @@ export const BusinessServices: React.FC = () => {
         onSaved={handleOnBusinessServiceUpdated}
         onCancel={handleOnCancelUpdateBusinessService}
       />
-    </PageSection>
+    </>
   );
 };
