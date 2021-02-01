@@ -1,7 +1,7 @@
 import React from "react";
 import { mount, shallow } from "enzyme";
 
-import { NewBusinessServiceForm } from "../new-business-service-form";
+import { BusinessServiceForm } from "../business-service-form";
 import { Button } from "@patternfly/react-core";
 
 describe("NewBusinessServiceForm", () => {

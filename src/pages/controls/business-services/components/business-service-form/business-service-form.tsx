@@ -1,10 +1,12 @@
-import React from "react";
-import { AxiosError, AxiosResponse } from "axios";
+import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
+import { AxiosError, AxiosPromise, AxiosResponse } from "axios";
 import { useFormik, FormikProvider, FormikHelpers } from "formik";
 import { object, string } from "yup";
 
 import {
   ActionGroup,
+  Alert,
   Button,
   ButtonVariant,
   Form,
@@ -13,9 +15,10 @@ import {
   TextInput,
 } from "@patternfly/react-core";
 
-import { createBusinessService } from "api/rest";
+import { createBusinessService, updateBusinessService } from "api/rest";
 import { BusinessService, Stakeholder } from "api/models";
 import {
+  getAxiosErrorMessage,
   getValidatedFromError,
   getValidatedFromErrorTouched,
 } from "utils/utils";
@@ -28,58 +31,67 @@ export interface FormValues {
   owner?: Stakeholder;
 }
 
-export interface NewBusinessServiceFormProps {
+export interface BusinessServiceFormProps {
   businessService?: BusinessService;
   onSaved: (response: AxiosResponse<BusinessService>) => void;
-  onSaveError: (error: AxiosError) => void;
   onCancel: () => void;
 }
 
-export const NewBusinessServiceForm: React.FC<NewBusinessServiceFormProps> = ({
+export const BusinessServiceForm: React.FC<BusinessServiceFormProps> = ({
   businessService,
   onSaved,
-  onSaveError,
   onCancel,
 }) => {
+  const { t } = useTranslation();
+
+  const [error, setError] = useState<AxiosError>();
+
   const initialValues: FormValues = {
     name: businessService?.name || "",
-    description: businessService?.description,
+    description: businessService?.description || "",
     owner: businessService?.owner,
   };
 
   const validationSchema = object().shape({
     name: string()
       .trim()
-      .required("This field is required.")
-      .min(3, "This field must contain at least 3 characters.")
-      .max(120, "This field must contain fewer than 120 characters.")
-      .matches(
-        /^[- \w]+$/,
-        "This field must contain only alphanumeric characters including underscore."
-      ),
+      .required(t("validation.required"))
+      .min(3, t("validation.minLength", { length: 3 }))
+      .max(120, t("validation.maxLength", { length: 120 }))
+      .matches(/^[- \w]+$/, t("validation.onlyCharactersAndUnderscore")),
     description: string()
       .trim()
-      .max(250, "This field must contain fewer than 250 characters."),
+      .max(250, t("validation.maxLength", { length: 250 })),
   });
 
   const onSubmit = (
     formValues: FormValues,
     formikHelpers: FormikHelpers<FormValues>
   ) => {
-    const businessService: BusinessService = {
+    const payload: BusinessService = {
       name: formValues.name,
       description: formValues.description,
       owner: formValues.owner ? { ...formValues.owner } : undefined,
     };
 
-    createBusinessService(businessService)
+    let promise: AxiosPromise<BusinessService>;
+    if (businessService) {
+      promise = updateBusinessService({
+        ...businessService,
+        ...payload,
+      });
+    } else {
+      promise = createBusinessService(payload);
+    }
+
+    promise
       .then((response) => {
         formikHelpers.setSubmitting(false);
         onSaved(response);
       })
       .catch((error) => {
         formikHelpers.setSubmitting(false);
-        onSaveError(error);
+        setError(error);
       });
   };
 
@@ -97,8 +109,15 @@ export const NewBusinessServiceForm: React.FC<NewBusinessServiceFormProps> = ({
   return (
     <FormikProvider value={formik}>
       <Form onSubmit={formik.handleSubmit}>
+        {error && (
+          <Alert
+            variant="danger"
+            isInline
+            title={getAxiosErrorMessage(error)}
+          />
+        )}
         <FormGroup
-          label="Name"
+          label={t("terms.name")}
           fieldId="name"
           isRequired={true}
           validated={getValidatedFromError(formik.errors.name)}
@@ -121,7 +140,7 @@ export const NewBusinessServiceForm: React.FC<NewBusinessServiceFormProps> = ({
           />
         </FormGroup>
         <FormGroup
-          label="Description"
+          label={t("terms.description")}
           fieldId="description"
           isRequired={false}
           validated={getValidatedFromError(formik.errors.description)}
@@ -143,7 +162,7 @@ export const NewBusinessServiceForm: React.FC<NewBusinessServiceFormProps> = ({
           />
         </FormGroup>
         <FormGroup
-          label="Owner"
+          label={t("terms.owner")}
           fieldId="owner"
           isRequired={false}
           validated={getValidatedFromError(formik.errors.owner)}
@@ -162,14 +181,14 @@ export const NewBusinessServiceForm: React.FC<NewBusinessServiceFormProps> = ({
               formik.isValidating
             }
           >
-            Save
+            {!businessService ? t("actions.create") : t("actions.save")}
           </Button>
           <Button
             variant={ButtonVariant.link}
             isDisabled={formik.isSubmitting || formik.isValidating}
             onClick={onCancel}
           >
-            Cancel
+            {t("actions.cancel")}
           </Button>
         </ActionGroup>
       </Form>

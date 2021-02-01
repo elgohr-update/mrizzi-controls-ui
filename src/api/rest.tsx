@@ -57,7 +57,13 @@ export const deleteBusinessService = (id: number): AxiosPromise => {
 export const createBusinessService = (
   obj: BusinessService
 ): AxiosPromise<BusinessService> => {
-  return APIClient.post(BUSINESS_SERVICES, obj);
+  return APIClient.post(`${BUSINESS_SERVICES}`, obj);
+};
+
+export const updateBusinessService = (
+  obj: BusinessService
+): AxiosPromise<BusinessService> => {
+  return APIClient.put(`${BUSINESS_SERVICES}/${obj.id}`, obj);
 };
 
 // Stakeholders

@@ -1,5 +1,4 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { AxiosError, AxiosResponse } from "axios";
 import { useTranslation } from "react-i18next";
 
 import {
@@ -9,21 +8,18 @@ import {
   EmptyStateBody,
   EmptyStateIcon,
   EmptyStateVariant,
-  Modal,
-  ModalVariant,
   PageSection,
   Title,
   ToolbarGroup,
   ToolbarItem,
 } from "@patternfly/react-core";
 import {
+  cellWidth,
   IActions,
   ICell,
-  IExtraColumnData,
-  IExtraData,
   IRowData,
   sortable,
-  SortByDirection,
+  TableText,
 } from "@patternfly/react-table";
 import { AddCircleOIcon } from "@patternfly/react-icons";
 
@@ -45,14 +41,11 @@ import {
 
 import { BusinessService, PageQuery, SortByQuery } from "api/models";
 import { getAxiosErrorMessage } from "utils/utils";
-import { NewBusinessServiceForm } from "./components/new-business-service-form";
 
-const columnIndexToField = (
-  _: React.MouseEvent,
-  index: number,
-  direction: SortByDirection,
-  extraData: IExtraColumnData
-) => {
+import { NewBusinessServiceModal } from "./components/new-business-service-modal";
+import { UpdateBusinessServiceModal } from "./components/update-business-service-modal";
+
+const columnIndexToField = (_: React.MouseEvent, index: number) => {
   switch (index) {
     case 0:
       return "name";
@@ -77,7 +70,9 @@ const itemsToRow = (items: BusinessService[]) => {
         title: item.name,
       },
       {
-        title: item.description,
+        title: (
+          <TableText wrapModifier="truncate">{item.description}</TableText>
+        ),
       },
       {
         title: item.owner?.displayName,
@@ -92,7 +87,15 @@ export const BusinessServices: React.FC = () => {
   const { t } = useTranslation();
 
   const [filterText, setFilterText] = useState("");
-  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const [
+    isNewBusinessServiceModalOpen,
+    setIsNewBusinessServiceModalOpen,
+  ] = useState(false);
+  const [
+    businessServiceToUpdate,
+    setbusinessServiceToUpdate,
+  ] = useState<BusinessService>();
 
   const { deleteBusinessService } = useDeleteBusinessService();
 
@@ -124,18 +127,28 @@ export const BusinessServices: React.FC = () => {
 
   const columns: ICell[] = [
     { title: t("terms.name"), transforms: [sortable] },
-    { title: t("terms.description") },
+    { title: t("terms.description"), transforms: [cellWidth(40)] },
     { title: t("terms.owner"), transforms: [sortable] },
   ];
 
   const actions: IActions = [
     {
+      title: t("actions.edit"),
+      onClick: (
+        event: React.MouseEvent,
+        rowIndex: number,
+        rowData: IRowData
+      ) => {
+        const row: BusinessService = getRow(rowData);
+        setbusinessServiceToUpdate(row);
+      },
+    },
+    {
       title: t("actions.delete"),
       onClick: (
         event: React.MouseEvent,
         rowIndex: number,
-        rowData: IRowData,
-        extraData: IExtraData
+        rowData: IRowData
       ) => {
         const row: BusinessService = getRow(rowData);
 
@@ -177,24 +190,31 @@ export const BusinessServices: React.FC = () => {
     handlePaginationChange({ page: 1 });
   };
 
-  const handleOnCreateNew = () => {
-    setIsModalOpen(true);
+  //
+  const handleOnOpenCreateNewBusinessServiceModal = () => {
+    setIsNewBusinessServiceModalOpen(true);
   };
 
-  const handleOnModalClose = () => {
-    setIsModalOpen(false);
+  //
+
+  const handleOnCancelCreateBusinessService = () => {
+    setIsNewBusinessServiceModalOpen(false);
   };
 
-  const handleOnBusinessServiceSaved = (
-    response: AxiosResponse<BusinessService>
-  ) => {
-    handleOnModalClose();
+  const handleOnBusinessServiceCreated = () => {
+    setIsNewBusinessServiceModalOpen(false);
     reloadTable(filterText, paginationQuery, sortByQuery);
   };
 
-  const onBusinessServiceSaveError = (error: AxiosError) => {
-    handleOnModalClose();
-    alertActions.addAlert("danger", "Error", getAxiosErrorMessage(error));
+  //
+
+  const handleOnBusinessServiceUpdated = () => {
+    setbusinessServiceToUpdate(undefined);
+    reloadTable(filterText, paginationQuery, sortByQuery);
+  };
+
+  const handleOnCancelUpdateBusinessService = () => {
+    setbusinessServiceToUpdate(undefined);
   };
 
   return (
@@ -230,7 +250,7 @@ export const BusinessServices: React.FC = () => {
                     type="button"
                     aria-label="new-company"
                     variant={ButtonVariant.primary}
-                    onClick={handleOnCreateNew}
+                    onClick={handleOnOpenCreateNewBusinessServiceModal}
                   >
                     {t("actions.createNew")}
                   </Button>
@@ -251,18 +271,17 @@ export const BusinessServices: React.FC = () => {
           }
         />
       </ConditionalRender>
-      <Modal
-        title={t("dialog.title.newBusinessService")}
-        variant={ModalVariant.medium}
-        isOpen={isModalOpen}
-        onClose={handleOnModalClose}
-      >
-        <NewBusinessServiceForm
-          onSaved={handleOnBusinessServiceSaved}
-          onSaveError={onBusinessServiceSaveError}
-          onCancel={handleOnModalClose}
-        />
-      </Modal>
+
+      <NewBusinessServiceModal
+        isOpen={isNewBusinessServiceModalOpen}
+        onSaved={handleOnBusinessServiceCreated}
+        onCancel={handleOnCancelCreateBusinessService}
+      />
+      <UpdateBusinessServiceModal
+        businessService={businessServiceToUpdate}
+        onSaved={handleOnBusinessServiceUpdated}
+        onCancel={handleOnCancelUpdateBusinessService}
+      />
     </PageSection>
   );
 };

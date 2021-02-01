@@ -1,1 +1,1 @@
-export { SelectStakeholder as SelectOwner } from "./select-stakeholder";
+export { SelectStakeholder } from "./select-stakeholder";
