@@ -53,7 +53,7 @@ describe("useFetchBusinessServices", () => {
     };
 
     new MockAdapter(axios)
-      .onGet(`${BUSINESS_SERVICES}?page=0&size=10&filter=something`)
+      .onGet(`${BUSINESS_SERVICES}?page=0&size=10&name=something`)
       .reply(200, data);
 
     // Use hook

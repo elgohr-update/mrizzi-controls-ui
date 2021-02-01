@@ -38,7 +38,7 @@ export const getBusinessServices = (
     page: pagination.page - 1,
     size: pagination.perPage,
     sort: sortByQuery,
-    filter: filters.filterText,
+    name: filters.filterText,
   };
   Object.keys(params).forEach((key) => {
     const value = (params as any)[key];
