@@ -9,6 +9,9 @@ import {
   EmptyStateIcon,
   EmptyStateVariant,
   Title,
+  ToolbarChip,
+  ToolbarChipGroup,
+  ToolbarFilter,
   ToolbarGroup,
   ToolbarItem,
 } from "@patternfly/react-core";
@@ -30,7 +33,6 @@ import {
   AppPlaceholder,
   ConditionalRender,
   AppTableWithControls,
-  SearchInput,
 } from "shared/components";
 import {
   useTableControls,
@@ -38,11 +40,21 @@ import {
   useDeleteBusinessService,
 } from "shared/hooks";
 
-import { BusinessService, PageQuery, SortByQuery } from "api/models";
+import { BusinessService } from "api/models";
 import { getAxiosErrorMessage } from "utils/utils";
 
 import { NewBusinessServiceModal } from "./components/new-business-service-modal";
 import { UpdateBusinessServiceModal } from "./components/update-business-service-modal";
+import {
+  FilterOption,
+  SearchFilter,
+} from "./components/search-filter/search-filter";
+
+enum FilterKey {
+  NAME = "name",
+  DESCRIPTION = "description",
+  OWNER = "owner",
+}
 
 const columnIndexToField = (_: React.MouseEvent, index: number) => {
   switch (index) {
@@ -81,20 +93,15 @@ const itemsToRow = (items: BusinessService[]) => {
 };
 
 export const BusinessServices: React.FC = () => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
 
-  const { t } = useTranslation();
+  const [nameFilters, setNameFilters] = useState<string[]>([]);
+  const [descriptionFilters, setDescriptionFilters] = useState<string[]>([]);
+  const [ownerFilters, setOwnerFilters] = useState<string[]>([]);
 
-  const [filterText, setFilterText] = useState("");
-
-  const [
-    isNewBusinessServiceModalOpen,
-    setIsNewBusinessServiceModalOpen,
-  ] = useState(false);
-  const [
-    businessServiceToUpdate,
-    setbusinessServiceToUpdate,
-  ] = useState<BusinessService>();
+  const [isNewModalOpen, setIsNewModalOpen] = useState(false);
+  const [rowToUpdate, setRowToUpdate] = useState<BusinessService>();
 
   const { deleteBusinessService } = useDeleteBusinessService();
 
@@ -113,16 +120,43 @@ export const BusinessServices: React.FC = () => {
     handleSortChange,
   } = useTableControls({ columnToField: columnIndexToField });
 
-  const reloadTable = useCallback(
-    (filterText: string, pagination: PageQuery, sortBy?: SortByQuery) => {
-      fetchBusinessServices({ filterText }, pagination, sortBy);
-    },
-    [fetchBusinessServices]
-  );
+  const refreshTable = useCallback(() => {
+    fetchBusinessServices(
+      {
+        name: nameFilters,
+        description: descriptionFilters,
+        owner: ownerFilters,
+      },
+      paginationQuery,
+      sortByQuery
+    );
+  }, [
+    nameFilters,
+    descriptionFilters,
+    ownerFilters,
+    paginationQuery,
+    sortByQuery,
+    fetchBusinessServices,
+  ]);
 
   useEffect(() => {
-    reloadTable(filterText, paginationQuery, sortByQuery);
-  }, [filterText, paginationQuery, sortByQuery, reloadTable]);
+    fetchBusinessServices(
+      {
+        name: nameFilters,
+        description: descriptionFilters,
+        owner: ownerFilters,
+      },
+      paginationQuery,
+      sortByQuery
+    );
+  }, [
+    nameFilters,
+    descriptionFilters,
+    ownerFilters,
+    paginationQuery,
+    sortByQuery,
+    fetchBusinessServices,
+  ]);
 
   const columns: ICell[] = [
     { title: t("terms.name"), transforms: [sortable] },
@@ -139,7 +173,7 @@ export const BusinessServices: React.FC = () => {
         rowData: IRowData
       ) => {
         const row: BusinessService = getRow(rowData);
-        setbusinessServiceToUpdate(row);
+        setRowToUpdate(row);
       },
     },
     {
@@ -164,7 +198,7 @@ export const BusinessServices: React.FC = () => {
                 row,
                 () => {
                   dispatch(confirmDialogActions.closeDialog());
-                  reloadTable(filterText, paginationQuery, sortByQuery);
+                  refreshTable();
                 },
                 (error) => {
                   dispatch(confirmDialogActions.closeDialog());
@@ -184,36 +218,114 @@ export const BusinessServices: React.FC = () => {
     },
   ];
 
-  const handleOnSearch = (filterText: string) => {
-    setFilterText(filterText);
+  // Advanced filters
+
+  const filterOptions: FilterOption[] = [
+    {
+      key: FilterKey.NAME,
+      name: t("terms.name"),
+    },
+    {
+      key: FilterKey.DESCRIPTION,
+      name: t("terms.description"),
+    },
+    {
+      key: FilterKey.OWNER,
+      name: t("terms.owner"),
+    },
+  ];
+
+  const handleOnClearAllFilters = () => {
+    setNameFilters([]);
+    setDescriptionFilters([]);
+    setOwnerFilters([]);
+  };
+
+  const handleOnFilterApplied = (key: string, filterText: string) => {
+    if (key === FilterKey.NAME) {
+      setNameFilters([...nameFilters, filterText]);
+    } else if (key === FilterKey.DESCRIPTION) {
+      setDescriptionFilters([...descriptionFilters, filterText]);
+    } else if (key === FilterKey.OWNER) {
+      setOwnerFilters([...ownerFilters, filterText]);
+    } else {
+      throw new Error("Can not apply filter " + key + ". It's not supported");
+    }
+
     handlePaginationChange({ page: 1 });
   };
 
-  //
-  const handleOnOpenCreateNewBusinessServiceModal = () => {
-    setIsNewBusinessServiceModalOpen(true);
+  const handleOnDeleteFilter = (
+    category: string | ToolbarChipGroup,
+    chip: ToolbarChip | string
+  ) => {
+    if (typeof chip !== "string") {
+      throw new Error("Can not delete filter. Chip must be a string");
+    }
+
+    let categoryKey: string;
+    if (typeof category === "string") {
+      categoryKey = category;
+    } else {
+      categoryKey = category.key;
+    }
+
+    if (categoryKey === FilterKey.NAME) {
+      setNameFilters(nameFilters.filter((f) => f !== chip));
+    } else if (categoryKey === FilterKey.DESCRIPTION) {
+      setDescriptionFilters(descriptionFilters.filter((f) => f !== chip));
+    } else if (categoryKey === FilterKey.OWNER) {
+      setOwnerFilters(ownerFilters.filter((f) => f !== chip));
+    } else {
+      throw new Error(
+        "Can not delete chip. Chip " + chip + " is not supported"
+      );
+    }
   };
 
-  //
+  const handleOnDeleteFilterGroup = (category: string | ToolbarChipGroup) => {
+    let categoryKey: string;
+    if (typeof category === "string") {
+      categoryKey = category;
+    } else {
+      categoryKey = category.key;
+    }
 
-  const handleOnCancelCreateBusinessService = () => {
-    setIsNewBusinessServiceModalOpen(false);
+    if (categoryKey === FilterKey.NAME) {
+      setNameFilters([]);
+    } else if (categoryKey === FilterKey.DESCRIPTION) {
+      setDescriptionFilters([]);
+    } else if (categoryKey === FilterKey.OWNER) {
+      setOwnerFilters([]);
+    } else {
+      throw new Error("Can not delete ChipGroup. ChipGroup is not supported");
+    }
+  };
+
+  // Create Modal
+
+  const handleOnOpenCreateNewBusinessServiceModal = () => {
+    setIsNewModalOpen(true);
   };
 
   const handleOnBusinessServiceCreated = () => {
-    setIsNewBusinessServiceModalOpen(false);
-    reloadTable(filterText, paginationQuery, sortByQuery);
+    setIsNewModalOpen(false);
+    refreshTable();
   };
 
-  //
+  const handleOnCancelCreateBusinessService = () => {
+    setIsNewModalOpen(false);
+  };
+
+  // Update Modal
 
   const handleOnBusinessServiceUpdated = () => {
-    setbusinessServiceToUpdate(undefined);
-    reloadTable(filterText, paginationQuery, sortByQuery);
+    setRowToUpdate(undefined);
+    refreshTable();
   };
 
   const handleOnCancelUpdateBusinessService = () => {
-    setbusinessServiceToUpdate(undefined);
+    setRowToUpdate(undefined);
   };
 
   return (
@@ -235,27 +347,63 @@ export const BusinessServices: React.FC = () => {
           isLoading={isFetching}
           loadingVariant="skeleton"
           fetchError={fetchError}
-          filtersApplied={filterText.length > 0}
+          clearAllFilters={handleOnClearAllFilters}
+          filtersApplied={
+            nameFilters.length +
+              descriptionFilters.length +
+              ownerFilters.length >
+            0
+          }
+          toolbarToggle={
+            <ToolbarGroup variant="filter-group">
+              <ToolbarFilter
+                chips={nameFilters}
+                deleteChip={handleOnDeleteFilter}
+                deleteChipGroup={handleOnDeleteFilterGroup}
+                categoryName={{ key: FilterKey.NAME, name: t("terms.name") }}
+                showToolbarItem
+              >
+                {null}
+              </ToolbarFilter>
+              <ToolbarFilter
+                chips={descriptionFilters}
+                deleteChip={handleOnDeleteFilter}
+                deleteChipGroup={handleOnDeleteFilterGroup}
+                categoryName={{
+                  key: FilterKey.DESCRIPTION,
+                  name: t("terms.description"),
+                }}
+                showToolbarItem
+              >
+                {null}
+              </ToolbarFilter>
+              <ToolbarFilter
+                chips={ownerFilters}
+                deleteChip={handleOnDeleteFilter}
+                deleteChipGroup={handleOnDeleteFilterGroup}
+                categoryName={{ key: FilterKey.OWNER, name: t("terms.owner") }}
+                showToolbarItem
+              >
+                <SearchFilter
+                  options={filterOptions}
+                  onApplyFilter={handleOnFilterApplied}
+                />
+              </ToolbarFilter>
+            </ToolbarGroup>
+          }
           toolbar={
-            <>
-              <ToolbarGroup>
-                <ToolbarItem>
-                  <SearchInput onSearch={handleOnSearch} placeholder="Filter" />
-                </ToolbarItem>
-              </ToolbarGroup>
-              <ToolbarGroup variant="button-group">
-                <ToolbarItem>
-                  <Button
-                    type="button"
-                    aria-label="new-company"
-                    variant={ButtonVariant.primary}
-                    onClick={handleOnOpenCreateNewBusinessServiceModal}
-                  >
-                    {t("actions.createNew")}
-                  </Button>
-                </ToolbarItem>
-              </ToolbarGroup>
-            </>
+            <ToolbarGroup variant="button-group">
+              <ToolbarItem>
+                <Button
+                  type="button"
+                  aria-label="new-company"
+                  variant={ButtonVariant.primary}
+                  onClick={handleOnOpenCreateNewBusinessServiceModal}
+                >
+                  {t("actions.createNew")}
+                </Button>
+              </ToolbarItem>
+            </ToolbarGroup>
           }
           noDataState={
             <EmptyState variant={EmptyStateVariant.small}>
@@ -272,12 +420,12 @@ export const BusinessServices: React.FC = () => {
       </ConditionalRender>
 
       <NewBusinessServiceModal
-        isOpen={isNewBusinessServiceModalOpen}
+        isOpen={isNewModalOpen}
         onSaved={handleOnBusinessServiceCreated}
         onCancel={handleOnCancelCreateBusinessService}
       />
       <UpdateBusinessServiceModal
-        businessService={businessServiceToUpdate}
+        businessService={rowToUpdate}
         onSaved={handleOnBusinessServiceUpdated}
         onCancel={handleOnCancelUpdateBusinessService}
       />
