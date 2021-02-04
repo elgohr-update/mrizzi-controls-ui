@@ -83,6 +83,8 @@ interface HookArgs {
     direction: SortByDirection,
     extraData: IExtraColumnData
   ) => string;
+
+  sortBy?: ISortBy;
 }
 
 interface HookState {
@@ -100,8 +102,28 @@ interface HookState {
 
 export const useTableControls = ({
   columnToField: columnIndexToField,
+  sortBy,
 }: HookArgs): HookState => {
-  const [state, dispatch] = useReducer(reducer, defaultState);
+  const [state, dispatch] = useReducer(
+    reducer,
+    sortBy
+      ? {
+          ...defaultState,
+          sortBy,
+          sortByQuery: {
+            orderBy: columnIndexToField(
+              null as any,
+              sortBy.index!,
+              sortBy.direction === "asc"
+                ? SortByDirection.asc
+                : SortByDirection.desc,
+              null as any
+            ),
+            orderDirection: sortBy.direction === "asc" ? "asc" : "desc",
+          },
+        }
+      : defaultState
+  );
 
   const handlePaginationChange = useCallback((pagination: PaginationAction) => {
     dispatch(setPagination(pagination));

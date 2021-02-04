@@ -94,7 +94,10 @@ export const BusinessServices: React.FC = () => {
     sortBy,
     handlePaginationChange,
     handleSortChange,
-  } = useTableControls({ columnToField: columnIndexToField });
+  } = useTableControls({
+    columnToField: columnIndexToField,
+    sortBy: { direction: "asc", index: 0 },
+  });
 
   const refreshTable = useCallback(() => {
     fetchBusinessServices(
