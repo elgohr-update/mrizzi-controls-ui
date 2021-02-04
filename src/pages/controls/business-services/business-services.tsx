@@ -8,6 +8,8 @@ import {
   EmptyStateBody,
   EmptyStateIcon,
   EmptyStateVariant,
+  Flex,
+  FlexItem,
   Title,
   ToolbarChip,
   ToolbarChipGroup,
@@ -15,14 +17,7 @@ import {
   ToolbarGroup,
   ToolbarItem,
 } from "@patternfly/react-core";
-import {
-  cellWidth,
-  IActions,
-  ICell,
-  IRowData,
-  sortable,
-  TableText,
-} from "@patternfly/react-table";
+import { cellWidth, ICell, sortable, TableText } from "@patternfly/react-table";
 import { AddCircleOIcon } from "@patternfly/react-icons";
 
 import { useDispatch } from "react-redux";
@@ -69,28 +64,9 @@ const columnIndexToField = (_: React.MouseEvent, index: number) => {
 
 const BUSINESS_SERVICE_FIELD = "businessService";
 
-const getRow = (rowData: IRowData): BusinessService => {
-  return rowData[BUSINESS_SERVICE_FIELD];
-};
-
-const itemsToRow = (items: BusinessService[]) => {
-  return items.map((item) => ({
-    [BUSINESS_SERVICE_FIELD]: item,
-    cells: [
-      {
-        title: item.name,
-      },
-      {
-        title: (
-          <TableText wrapModifier="truncate">{item.description}</TableText>
-        ),
-      },
-      {
-        title: item.owner?.displayName,
-      },
-    ],
-  }));
-};
+// const getRow = (rowData: IRowData): BusinessService => {
+//   return rowData[BUSINESS_SERVICE_FIELD];
+// };
 
 export const BusinessServices: React.FC = () => {
   const { t } = useTranslation();
@@ -162,61 +138,109 @@ export const BusinessServices: React.FC = () => {
     { title: t("terms.name"), transforms: [sortable] },
     { title: t("terms.description"), transforms: [cellWidth(40)] },
     { title: t("terms.owner"), transforms: [sortable] },
-  ];
-
-  const actions: IActions = [
     {
-      title: t("actions.edit"),
-      onClick: (
-        event: React.MouseEvent,
-        rowIndex: number,
-        rowData: IRowData
-      ) => {
-        const row: BusinessService = getRow(rowData);
-        setRowToUpdate(row);
+      title: "",
+      props: {
+        className: "pf-u-text-align-right",
       },
     },
-    {
-      title: t("actions.delete"),
-      onClick: (
-        event: React.MouseEvent,
-        rowIndex: number,
-        rowData: IRowData
-      ) => {
-        const row: BusinessService = getRow(rowData);
+  ];
 
-        dispatch(
-          confirmDialogActions.openDialog({
-            title: t("dialog.title.delete", { what: row.name }),
-            message: t("dialog.message.delete", { what: row.name }),
-            variant: ButtonVariant.danger,
-            confirmBtnLabel: t("actions.delete"),
-            cancelBtnLabel: t("actions.cancel"),
-            onConfirm: () => {
-              dispatch(confirmDialogActions.processing());
-              deleteBusinessService(
-                row,
-                () => {
-                  dispatch(confirmDialogActions.closeDialog());
-                  refreshTable();
-                },
-                (error) => {
-                  dispatch(confirmDialogActions.closeDialog());
-                  dispatch(
-                    alertActions.addAlert(
-                      "danger",
-                      "Error",
-                      getAxiosErrorMessage(error)
-                    )
-                  );
-                }
-              );
+  const itemsToRow = (items: BusinessService[]) => {
+    return items.map((item) => ({
+      [BUSINESS_SERVICE_FIELD]: item,
+      cells: [
+        {
+          title: item.name,
+        },
+        {
+          title: (
+            <TableText wrapModifier="truncate">{item.description}</TableText>
+          ),
+        },
+        {
+          title: item.owner?.displayName,
+        },
+        {
+          title: (
+            <Flex>
+              <FlexItem align={{ default: "alignRight" }}>
+                <Button variant="secondary" onClick={() => editRow(item)}>
+                  {t("actions.edit")}
+                </Button>
+              </FlexItem>
+              <FlexItem>
+                <Button variant="link" onClick={() => deleteRow(item)}>
+                  {t("actions.delete")}
+                </Button>
+              </FlexItem>
+            </Flex>
+          ),
+        },
+      ],
+    }));
+  };
+
+  // const actions: IActions = [
+  //   {
+  //     title: t("actions.edit"),
+  //     onClick: (
+  //       event: React.MouseEvent,
+  //       rowIndex: number,
+  //       rowData: IRowData
+  //     ) => {
+  //       const row: BusinessService = getRow(rowData);
+  //       editRow(row);
+  //     },
+  //   },
+  //   {
+  //     title: t("actions.delete"),
+  //     onClick: (
+  //       event: React.MouseEvent,
+  //       rowIndex: number,
+  //       rowData: IRowData
+  //     ) => {
+  //       const row: BusinessService = getRow(rowData);
+  //       deleteRow(row);
+  //     },
+  //   },
+  // ];
+
+  const editRow = (row: BusinessService) => {
+    setRowToUpdate(row);
+  };
+
+  const deleteRow = (row: BusinessService) => {
+    dispatch(
+      confirmDialogActions.openDialog({
+        title: t("dialog.title.delete", { what: row.name }),
+        message: t("dialog.message.delete", { what: row.name }),
+        variant: ButtonVariant.danger,
+        confirmBtnLabel: t("actions.delete"),
+        cancelBtnLabel: t("actions.cancel"),
+        onConfirm: () => {
+          dispatch(confirmDialogActions.processing());
+          deleteBusinessService(
+            row,
+            () => {
+              dispatch(confirmDialogActions.closeDialog());
+              refreshTable();
             },
-          })
-        );
-      },
-    },
-  ];
+            (error) => {
+              dispatch(confirmDialogActions.closeDialog());
+              dispatch(
+                alertActions.addAlert(
+                  "danger",
+                  "Error",
+                  getAxiosErrorMessage(error)
+                )
+              );
+            }
+          );
+        },
+      })
+    );
+  };
 
   // Advanced filters
 
@@ -343,7 +367,7 @@ export const BusinessServices: React.FC = () => {
           handlePaginationChange={handlePaginationChange}
           handleSortChange={handleSortChange}
           columns={columns}
-          actions={actions}
+          // actions={actions}
           isLoading={isFetching}
           loadingVariant="skeleton"
           fetchError={fetchError}
