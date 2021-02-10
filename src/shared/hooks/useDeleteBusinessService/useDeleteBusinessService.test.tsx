@@ -21,9 +21,8 @@ describe("useDeleteBusinessService", () => {
       id: 1,
       name: "any name",
       owner: {
-        name: "Pedro",
-        surname: "Perez",
-        email: "",
+        email: "pedro@domain.com",
+        displayName: "Pedro",
       },
     };
     const onSuccessMock = jest.fn();
@@ -56,9 +55,8 @@ describe("useDeleteBusinessService", () => {
       id: 1,
       name: "any name",
       owner: {
-        name: "Pedro",
-        surname: "Perez",
-        email: "",
+        displayName: "Pedro",
+        email: "pedro@domain.com",
       },
     };
     const onSuccessMock = jest.fn();

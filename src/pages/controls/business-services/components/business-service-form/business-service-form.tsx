@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { AxiosError, AxiosPromise, AxiosResponse } from "axios";
 import { useFormik, FormikProvider, FormikHelpers } from "formik";
@@ -24,6 +24,7 @@ import {
 } from "utils/utils";
 
 import { SelectStakeholderFormField } from "../select-stakeholder-form-field";
+import { useFetchStakeholders } from "shared/hooks";
 
 export interface FormValues {
   name: string;
@@ -45,6 +46,17 @@ export const BusinessServiceForm: React.FC<BusinessServiceFormProps> = ({
   const { t } = useTranslation();
 
   const [error, setError] = useState<AxiosError>();
+
+  const {
+    stakeholders,
+    isFetching,
+    fetchError,
+    fetchAllStakeholders,
+  } = useFetchStakeholders();
+
+  useEffect(() => {
+    fetchAllStakeholders();
+  }, [fetchAllStakeholders]);
 
   const initialValues: FormValues = {
     name: businessService?.name || "",
@@ -168,7 +180,12 @@ export const BusinessServiceForm: React.FC<BusinessServiceFormProps> = ({
           validated={getValidatedFromError(formik.errors.owner)}
           helperTextInvalid={formik.errors.owner}
         >
-          <SelectStakeholderFormField name="owner" />
+          <SelectStakeholderFormField
+            name="owner"
+            stakeholders={stakeholders?.data || []}
+            isFetching={isFetching}
+            fetchError={fetchError}
+          />
         </FormGroup>
         <ActionGroup>
           <Button

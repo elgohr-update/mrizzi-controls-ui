@@ -1,4 +1,5 @@
 import React, { useCallback, useState } from "react";
+import { AxiosError } from "axios";
 
 import {
   Select,
@@ -6,10 +7,10 @@ import {
   SelectOptionObject,
   SelectVariant,
 } from "@patternfly/react-core";
-import { SpinnerIcon } from "@patternfly/react-icons";
+import { WarningTriangleIcon } from "@patternfly/react-icons";
 
 import { Stakeholder } from "api/models";
-import { useFetchStakeholders } from "shared/hooks";
+import { getAxiosErrorMessage } from "utils/utils";
 
 interface SelectOptionStakeholder extends SelectOptionObject {
   stakeholder: Stakeholder;
@@ -24,29 +25,26 @@ const selectOptionMapper = (
 
 export interface SelectStakeholderProps {
   value?: Stakeholder;
+  stakeholders: Stakeholder[];
+  isFetching?: boolean;
+  fetchError?: AxiosError;
   onSelect: (value: Stakeholder) => void;
+  onClear: () => void;
 }
 
 export const SelectStakeholder: React.FC<SelectStakeholderProps> = ({
   value,
+  stakeholders,
+  isFetching,
+  fetchError,
   onSelect,
+  onClear,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const {
-    stakeholders,
-    isFetching,
-    fetchAllStakeholders,
-  } = useFetchStakeholders();
 
-  const handleOnToggle = useCallback(
-    (isOpen: boolean) => {
-      setIsOpen(isOpen);
-      if (isOpen) {
-        fetchAllStakeholders();
-      }
-    },
-    [fetchAllStakeholders]
-  );
+  const handleOnToggle = useCallback((isOpen: boolean) => {
+    setIsOpen(isOpen);
+  }, []);
 
   const handleOnSelect = (
     event: React.MouseEvent | React.ChangeEvent,
@@ -62,17 +60,31 @@ export const SelectStakeholder: React.FC<SelectStakeholderProps> = ({
     onSelect(selectedOption.stakeholder);
   };
 
+  const handleOnClearSelection = () => {
+    onClear();
+  };
+
+  let customContent;
+  if (isFetching) {
+    customContent = <div>&nbsp;Loading...</div>;
+  } else if (fetchError) {
+    customContent = <div>&nbsp;{getAxiosErrorMessage(fetchError)}</div>;
+  }
+
   return (
     <Select
-      toggleIcon={isFetching ? <SpinnerIcon /> : undefined}
+      toggleIcon={fetchError && <WarningTriangleIcon />}
       variant={SelectVariant.typeahead}
       onToggle={handleOnToggle}
       onSelect={handleOnSelect}
+      onClear={handleOnClearSelection}
       selections={value ? value.displayName : undefined}
       isOpen={isOpen}
-      menuAppendTo={window.document.body}
+      menuAppendTo={() => document.body}
+      maxHeight={350}
+      customContent={customContent}
     >
-      {stakeholders?.data
+      {stakeholders
         .map((f) => selectOptionMapper(f))
         .map((elem, index) => (
           <SelectOption key={index} value={elem}>
