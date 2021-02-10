@@ -1,6 +1,6 @@
 {
   "realm": "quarkus",
-  "auth-server-url": "http://controls-ui-mta-pathfinder.apps.ocp4.prod.psi.redhat.com/auth/",
+  "auth-server-url": "http://localhost:8180/auth/",
   "resource": "controls-ui",
   "public-client": true
 }
