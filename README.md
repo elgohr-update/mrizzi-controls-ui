@@ -1,21 +1,33 @@
-# Controls UI
+# Tackle UI
 
-## Development
+The UI web console for the tackle project.
+
+# Development
 
 Follow the set of instructions below to start the UI in development mode.
 
-## Clone this repository
+# Clone repository
 
 ```shell
 git clone https://github.com/carlosthe19916/controls-ui
 ```
 
-## Start dependencies
+# Start dependencies
 
 This project depends on other resources:
 
-- Keycloak (the authentication and authorization system)
-- Controls (the backend API)
+- Keycloak
+- Controls
+
+## Start dependencines with docker-compose
+
+Start the dependencies using `docker-compose.yml`:
+
+```shell
+docker-compose up
+```
+
+## Start dependencies with Docker
 
 ### Create a docker network
 
@@ -24,8 +36,6 @@ docker network create konveyor
 ```
 
 ### Start keycloak
-
-Use docker for starting keycloak:
 
 ```shell
 docker run -d \
@@ -40,7 +50,7 @@ quay.io/keycloak/keycloak:12.0.2
 
 ### Start controls
 
-Start the controls database:
+Start the controls' database:
 
 ```shell
 docker run -d \
@@ -68,7 +78,7 @@ docker run -d \
 quay.io/mrizzi/poc-controls:latest-native
 ```
 
-## Start the UI
+# Start the UI
 
 Install the npm dependencies:
 
